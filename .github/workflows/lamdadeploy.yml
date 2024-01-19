@@ -1,13 +1,12 @@
 name: Backend Lambda Deploy
-run-name: Build and Deploy Lambda by 🚀 ${{ github.actor }} 🤖
+
 on:
   push:
     branches:
       - main
-    paths:
-      - 'Abschlussprojekt_Backend/**'
     # tags:
     #   - test-cicd-karim
+
 env:
   AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN || 'default' }}
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY || 'default' }}
@@ -19,52 +18,38 @@ jobs:
   Lambda-Code-Or-Function:
     runs-on: ubuntu-latest
     outputs:
-      LAMBDA_TF: ${{ steps.python-script.outputs.LAMBDA_TF }}
+      LAMBDA_TF: ${{ steps.list-functions.outputs.LAMBDA_TF }}
     steps:
       - name: Lade neuen Repo-Zustand
-        uses: actions/checkout@v4
-      - name: erstelle ./pre-push-repo
-        run: mkdir ./pre-push-repo
-      - name: Lade letzten Repo-Zustand in ./pre-push-repo
-        uses: actions/checkout@v4
-        with:
-          path: './pre-push-repo'
-          ref: $GITHUB_LAST_PUSH
-      - name: installiere NodeJs und npm
-        uses: actions/setup-node@v4
-        with:
-          node-version: '>=18.0.0'
-      - name: installiere Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10' 
-      - name: Prüfe Bedingungen und erstelle ZIP's
-        run: python .worklfows/script/lambda.py
-      - name: Get Python-Script results
-        id: python-script
-        run: echo $LAMBDA_TF >> $GITHUB_OUTPUT
-#       - name: Lade artifacts hoch
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: Lambda-Zips
-#           path: "~/lambdas/artifacts"
+        uses: actions/checkout@v4  
+      - name: List Lambda Functions
+        working-directory: ${{ github.workspace }}
+        id: list-functions
+        run: |
+          # Hier kannst du den Befehl anpassen, um die Lambda-Funktionen aufzulisten
+          lambda_functions=$(ls)
+          echo "::set-output name=LAMBDA_TF::${lambda_functions}"
+          echo ${lambda_functions}
 
-#   Lambda-Update-Code:
-#     if: ${{ LAMBDA_TF == "False" }}
-#     runs-on: ubuntu-latest
-#     needs: Lambda-Code-Or-Function
-#     env:
-#       LAMBDA_TF: ${{ needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF }}
-#     outputs:
-#       ARTIFACT_DIR: ${{ steps.artifact-ls.outputs.ARTIFACT_DIR }}
-#     steps:
-#       - name: Get Lambda-Zips
-#         uses: actions/download-artifact@v4
-#         with:
-#           name: Lambda-Zips
-#           path: "~/lambdas/artifacts"
-#       - name: Echo LAMBDA_TF
-#         run: echo $LAMBDA_TF
-#       - name: Echo artifacts
-#         id: artifact-ls
-#         run: ls -la ~/lambdas/artifacts >> $GITHUB_OUTPUT
+  Build-and-Zip-Lambdas:
+    needs: Lambda-Code-Or-Function
+    strategy:
+      matrix:
+        lambda_function: ${{ needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lade neuen Repo-Zustand
+        uses: actions/checkout@v4  
+      - name: Install zip
+        uses: montudor/action-zip@v1       
+      - name: installiere nodeJs
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: install node_modules
+        working-directory: ${{ matrix.lambda_function }}
+        run: npm ci  
+      - name: zip functions
+        run: | 
+          zip -q -r ${{ matrix.lambda_function}}.zip ${{ matrix.lambda_function }} node_modules package.json index.js package-lock.json
+          echo "packed function ${{matrix.lambda_function }}"
