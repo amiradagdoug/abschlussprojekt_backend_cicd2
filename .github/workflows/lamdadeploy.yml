@@ -28,7 +28,7 @@ jobs:
         run: |
           # Hier kannst du den Befehl anpassen, um die Lambda-Funktionen aufzulisten
           lambda_functions=$(ls)
-          echo "::set-output name=LAMBDA_TF::${lambda_functions}"
+          echo "LAMBDA_TF=${lambda_functions}" >> $GITHUB_OUTPUT
           echo ${lambda_functions}
 
   Build-and-Zip-Lambdas:
