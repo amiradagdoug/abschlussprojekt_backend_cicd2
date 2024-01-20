@@ -1,12 +1,8 @@
 name: Backend Lambda Deploy
-
 on:
   push:
     branches:
-      - main
-    # tags:
-    #   - test-cicd-karim
-
+      - feature/**
 env:
   AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN || 'default' }}
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY || 'default' }}
@@ -26,14 +22,8 @@ jobs:
         working-directory: ${{ github.workspace }}
         id: list-functions
         run: |
-          directories=$(find . -type d -not -path "./.*" -prune)
-          json="["
-          for dir in $directories; do
-              json="$json\"$dir\","
-          done
-          json="${json::-1}]"
-          echo "$json"
-          echo "LAMBDA_TF=${json}" >> $GITHUB_OUTPUT
+          cd ${{ github.workspace }}
+          echo "LAMBDA_TF=$(bash ./.github/scripts/lsdirs.sh)" >> $GITHUB_OUTPUT
 
   Build-and-Zip-Lambdas:
     needs: Lambda-Code-Or-Function
