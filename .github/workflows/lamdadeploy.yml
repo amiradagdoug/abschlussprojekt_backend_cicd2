@@ -24,6 +24,8 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           echo "LAMBDA_TF=$(bash ./.github/scripts/lsdirs.sh)" >> $GITHUB_OUTPUT
+      - name: result list-functions
+        run: echo "${{ steps.list-functions.outputs.LAMBDA_TF }}"
 
   Build-and-Zip-Lambdas:
     needs: Lambda-Code-Or-Function
@@ -40,6 +42,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Display Funktion - ${{ matrix.lambda_function }}
+        run: echo "packing Lambda-Funktion ${{ matrix.lambda_function }}"
       - name: install node_modules
         working-directory: ${{ matrix.lambda_function }}
         run: npm ci  
@@ -47,3 +51,5 @@ jobs:
         run: | 
           zip -q -r ${{ matrix.lambda_function }}.zip ${{ matrix.lambda_function }} node_modules package.json index.js package-lock.json
           echo "packed function ${{ matrix.lambda_function }}"
+      - name: Display result
+        run: echo "$(ls ${{ matrix.lambda_function }}.zip)"
