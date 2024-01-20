@@ -1,34 +1,4 @@
-name: Backend Lambda Deploy
-on:
-  push:
-    branches:
-      - feature/**
-env:
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN || 'default' }}
-  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY || 'default' }}
-  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY || 'default' }}
-  AWS_ENDPOINT_URL_SSO: ${{ vars.AWS_ENDPOINT_URL_SSO || 'default' }}
-  AWS_PROFILE: ${{ vars.AWS_PROFILE || 'techstarter' }}
-
 jobs:
-  Lambda-Code-Or-Function:
-    runs-on: ubuntu-latest
-    outputs:
-      LAMBDA_TF: ${{ steps.list-functions.outputs.LAMBDA_TF }}
-    steps:
-      - name: Lade neuen Repo-Zustand
-        uses: actions/checkout@v4  
-      - name: List Lambda Functions
-        working-directory: ${{ github.workspace }}
-        id: list-functions
-        run: |
-          cd ${{ github.workspace }}
-          echo "LAMBDA_TF=$(bash ./.github/scripts/lsdirs.sh)" >> $GITHUB_OUTPUT
-          echo "LAMBDI.JSON FILE Created:"
-          cat lambdi.json
-      - name: result list-functions
-        run: echo "${{ steps.list-functions.outputs.LAMBDA_TF }}"
-        # trigger Matrix-Job Build-and-Zip-Lambdas
   Build-and-Zip-Lambdas:
     needs: Lambda-Code-Or-Function
     strategy:
