@@ -6,26 +6,26 @@ on:
       - main
 
 jobs:
-  AWS_credentials:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS CLI
-        run: |
-          mkdir -p ~/.aws/
-          echo "$super_secret" > ~/.aws/credentials
-        env:
-          super_secret: ${{ secrets.AWS_CONFIG }}
-
-      - name: Show AWS credentials
-        run: cat ~/.aws/credentials
-
-      - name: List AWS profiles
-        run: aws configure list-profiles
-
-      - name: List S3 buckets
-        run: aws s3 ls --region eu-central-1 --profile techstarter
-
-  Create_lambdi_json:
+  example-job:
+          runs-on: ubuntu-latest
+          steps:
+            - name: Configure AWS CLI
+              run: |
+                mkdir -p ~/.aws/
+                echo "$super_secret" > ~/.aws/credentials
+              env:
+                super_secret: ${{ secrets.AWS_CONFIG }}
+      
+            - name: Show AWS credentials
+              run: cat ~/.aws/credentials
+      
+            - name: List AWS profiles
+              run: aws configure list-profiles
+      
+            - name: List S3 buckets
+              run: aws s3 ls --region eu-central-1 --profile techstarter
+      
+  Lambda-Code-Or-Function:
     runs-on: ubuntu-latest
     outputs:
       LAMBDA_TF: ${{ steps.list-functions.outputs.LAMBDA_TF }}
@@ -53,13 +53,12 @@ jobs:
         env:
           super_secret: ${{ secrets.AWS_CONFIG }}
 
-      continue-on-error: true
-
+        continue-on-error: true
   Build-and-Zip-Lambdas2:
-    needs: Create_lambdi_json
+    needs: Lambda-Code-Or-Function
     strategy:
       matrix:
-        lambda_function: ${{ fromJson(needs.Create_lambdi_json.outputs.LAMBDA_TF) }}
+        lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF) }}
         
     runs-on: ubuntu-latest
     steps:
@@ -84,8 +83,8 @@ jobs:
         working-directory: ${{ matrix.lambda_function }}
         continue-on-error: true
         run: |
-          npm install
-          npm ci
+            npm install
+            npm ci
         
       - name: Cache function-zips 
         id: cache-function-zips
@@ -102,3 +101,5 @@ jobs:
         run: echo "$(ls ${{ matrix.lambda_function }}.zip)"
       - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
         run: echo "deploying ${{ matrix.lambda_function }}.zip to s3"
+
+      
