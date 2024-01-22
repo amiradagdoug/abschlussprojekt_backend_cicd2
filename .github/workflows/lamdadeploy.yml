@@ -14,7 +14,7 @@ jobs:
                 mkdir -p ~/.aws/
                 echo "$super_secret" > ~/.aws/credentials
               env:
-                super_secret: ${{ secrets.AWS_CONFIG }}
+                super_secret: ${{ secrets.AWS_CONFIG1 }}
       
             - name: Show AWS credentials
               run: cat ~/.aws/credentials
@@ -49,9 +49,9 @@ jobs:
         run: echo "${{ steps.list-functions.outputs.LAMBDA_TF }}"
         # trigger Matrix-Job Build-and-Zip-Lambdas
       - name: Deploy Lambdi.json to S3
-        run: aws s3 cp lambdi.json s3://tfstate-bucket-abschlussproject1/lambdi.json
+        run: aws s3 cp lambdi.json s3://tf-backend-abschlussprojekt/lambdi.json
         env:
-          super_secret: ${{ secrets.AWS_CONFIG }}
+          super_secret: ${{ secrets.AWS_CONFIG1 }}
 
         continue-on-error: true
   Build-and-Zip-Lambdas2:
