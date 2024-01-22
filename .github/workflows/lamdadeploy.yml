@@ -13,7 +13,7 @@ env:
   AWS_PROFILE: ${{ vars.AWS_PROFILE || 'techstarter' }}
 
 jobs:
-  Lambda-Code-Or-Function:
+  Lambda-Code-Or-Function1:
     runs-on: ubuntu-latest
     outputs:
       LAMBDA_TF: ${{ steps.list-functions.outputs.LAMBDA_TF }}
@@ -34,8 +34,8 @@ jobs:
       - name: Deploy Lambda.json to S3
         run: aws s3 cp lambdi.json s3://tfstate-bucket-abschlussproject/lambdi.json
           
-  Build-and-Zip-Lambdas:
-    needs: Lambda-Code-Or-Function
+  Build-and-Zip-Lambdas2:
+    needs: Lambda-Code-Or-Function1
     strategy:
       matrix:
         lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF)}}
