@@ -5,14 +5,22 @@ on:
     branches:
       - main
 
-env:
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN || 'default' }}
-  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY || 'default' }}
-  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY || 'default' }}
-  AWS_ENDPOINT_URL_SSO: ${{ vars.AWS_ENDPOINT_URL_SSO || 'default' }}
-  AWS_PROFILE: ${{ vars.AWS_PROFILE || 'techstarter' }}
-
 jobs:
+  example-job:
+    runs-on: ubuntu-latest
+    env:
+      super_secret: ${{ secrets.AWS_CONFIG }}
+
+    steps:
+      - name: Show AWS credentials
+        run: cat ~/.aws/credentials
+
+      - name: List AWS profiles
+        run: aws configure list-profiles
+
+      - name: List S3 buckets
+        run: aws s3 ls --region eu-central-1 --profile techstarter
+
   Lambda-Code-Or-Function:
     runs-on: ubuntu-latest
     outputs:
@@ -43,8 +51,7 @@ jobs:
     needs: Lambda-Code-Or-Function
     strategy:
       matrix:
-      
-       lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF) }}
+        lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF) }}
         
     runs-on: ubuntu-latest
     steps:
@@ -84,10 +91,8 @@ jobs:
       - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
         run: echo "deploying ${{ matrix.lambda_function }}.zip to s3"
 
-
       - name: Clear Cache
         run: |
           git rm -r --cached .
           git add .
           git commit -m "Clear cache"
-
