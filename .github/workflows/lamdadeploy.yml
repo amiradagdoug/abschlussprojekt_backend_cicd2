@@ -3,7 +3,7 @@ name: Backend Lambda Deploy S3
 on:
   push:
     branches:
-      - main/**
+      - main
 
 env:
   AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN || 'default' }}
