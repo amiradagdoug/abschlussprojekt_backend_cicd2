@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-        example-job:
+  example-job:
           runs-on: ubuntu-latest
           steps:
             - name: Configure AWS CLI
