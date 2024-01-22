@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  example-job:
+  AWS _credentials:
           runs-on: ubuntu-latest
           steps:
             - name: Configure AWS CLI
@@ -25,7 +25,7 @@ jobs:
             - name: List S3 buckets
               run: aws s3 ls --region eu-central-1 --profile techstarter
       
-  Lambda-Code-Or-Function:
+  Create_lambdi_json:
     runs-on: ubuntu-latest
     outputs:
       LAMBDA_TF: ${{ steps.list-functions.outputs.LAMBDA_TF }}
@@ -55,10 +55,10 @@ jobs:
 
         continue-on-error: true
   Build-and-Zip-Lambdas2:
-    needs: Lambda-Code-Or-Function
+    needs: Create_lambdi_json
     strategy:
       matrix:
-        lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF) }}
+        lambda_function: ${{ fromJson(needs.Create_lambdi_json.outputs.LAMBDA_TF) }}
         
     runs-on: ubuntu-latest
     steps:
