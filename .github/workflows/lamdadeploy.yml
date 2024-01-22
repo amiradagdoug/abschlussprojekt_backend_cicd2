@@ -26,8 +26,14 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           echo "LAMBDA_TF=$(bash ./.github/scripts/lsdirs.sh)" >> $GITHUB_OUTPUT
+          
           echo "LAMBDI.JSON FILE Created:"
           cat lambdi.json
+
+      - name: Check lambdi.json existence
+        run: |
+          echo "lambdi.json exists: $(ls -l lambdi.json)"
+
       - name: result list-functions
         run: echo "${{ steps.list-functions.outputs.LAMBDA_TF }}"
         # trigger Matrix-Job Build-and-Zip-Lambdas
@@ -38,7 +44,9 @@ jobs:
     needs: Lambda-Code-Or-Function
     strategy:
       matrix:
-        lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF)}}
+      
+       lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF) }}
+        
     runs-on: ubuntu-latest
     steps:
       - name: Lade neuen Repo-Zustand
@@ -76,3 +84,11 @@ jobs:
         run: echo "$(ls ${{ matrix.lambda_function }}.zip)"
       - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
         run: echo "deploying ${{ matrix.lambda_function }}.zip to s3"
+
+
+      - name: Clear Cache
+        run: |
+          git rm -r --cached .
+          git add .
+          git commit -m "Clear cache"
+
