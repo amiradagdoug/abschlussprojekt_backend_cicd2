@@ -1,12 +1,8 @@
 name: Backend Lambda Deploy
-
 on:
   push:
     branches:
-      - main
-    # tags:
-    #   - test-cicd-karim
-
+      - feature/**
 env:
   AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN || 'default' }}
   AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY || 'default' }}
@@ -27,15 +23,16 @@ jobs:
         working-directory: ${{ github.workspace }}
         id: list-functions
         run: |
+          # Hier kannst du den Befehl anpassen, um die Lambda-Funktionen aufzulisten
           lambda_functions=$(ls)
           echo "LAMBDA_TF=${lambda_functions}" >> $GITHUB_OUTPUT
-          echo "Lambda Functions: ${lambda_functions}"
+          echo ${lambda_functions}
 
   Build-and-Zip-Lambdas:
     needs: Lambda-Code-Or-Function
     strategy:
       matrix:
-        lambda_function: ${{ needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF }}
+        lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF)}}
     runs-on: ubuntu-latest
     steps:
       - name: Lade neuen Repo-Zustand
@@ -55,6 +52,5 @@ jobs:
 
       - name: zip functions
         run: | 
-          zip -q -r ${{ matrix.lambda_function }}.zip ${{ matrix.lambda_function }} node_modules package.json index.js package-lock.json
-          echo "packed function ${{ matrix.lambda_function }}"
-
+          zip -q -r ${{ matrix.lambda_function}}.zip ${{ matrix.lambda_function }} node_modules package.json index.js package-lock.json
+          echo "packed function ${{matrix.lambda_function }}"
