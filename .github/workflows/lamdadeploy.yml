@@ -50,7 +50,10 @@ jobs:
         # trigger Matrix-Job Build-and-Zip-Lambdas
       - name: Deploy Lambdi.json to S3
         run: aws s3 cp lambdi.json s3://tfstate-bucket-abschlussproject1/lambdi.json
-          
+        env:
+          super_secret: ${{ secrets.AWS_CONFIG }}
+
+        continue-on-error: true
   Build-and-Zip-Lambdas2:
     needs: Lambda-Code-Or-Function
     strategy:
