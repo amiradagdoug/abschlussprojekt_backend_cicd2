@@ -38,7 +38,7 @@ jobs:
     needs: Lambda-Code-Or-Function1
     strategy:
       matrix:
-        lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF)}}
+        lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function1.outputs.LAMBDA_TF)}}
     runs-on: ubuntu-latest
     steps:
       - name: Lade neuen Repo-Zustand
