@@ -1,0 +1,43 @@
+jobs:
+    Build-and-Zip-Lambdas:
+      needs: Lambda-Code-Or-Function
+      strategy:
+        matrix:
+          lambda_function: ${{ fromJson(needs.Lambda-Code-Or-Function.outputs.LAMBDA_TF)}}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Lade neuen Repo-Zustand
+          uses: actions/checkout@v4  
+        - name: Install zip
+          uses: montudor/action-zip@v1       
+        - name: installiere nodeJs
+          uses: actions/setup-node@v3
+          with:
+            node-version: 18
+        - name: Display Funktion - ${{ matrix.lambda_function }}
+          run: echo "packing Lambda-Funktion ${{ matrix.lambda_function }}"
+        - name: Cache node-modules
+          id: cache-node-modules
+          uses: actions/cache@v4
+          with:
+            path: ${{ github.workspace }}/${{ matrix.lambda_function }}
+            key: ${{ matrix.lambda_function }}-packages-${{ hashFiles('${{ matrix.lambda_function }}/package-lock.json') }}
+        - name: install node_modules
+          if: steps.cache-primes.outputs.cache-hit != 'true'
+          working-directory: ${{ matrix.lambda_function }}
+          run: npm ci  
+        - name: Cache function-zips 
+          id: cache-function-zips
+          uses: actions/cache@v4
+          with:
+            path: ${{ github.workspace }}
+            key: ${{ matrix.lambda_function }}-zip-${{ hashFiles('${{ matrix.lambda_function }}/index.js', '${{ matrix.lambda_function }}/package-lock.json') }}
+        - name: zip functions
+          if: steps.cache-function-zips.outputs.cache-hit != 'true'
+          run: | 
+            zip -q -r ${{ matrix.lambda_function }}.zip ${{ matrix.lambda_function }} node_modules package.json index.js package-lock.json
+            echo "packed function ${{ matrix.lambda_function }}"
+        - name: Display result
+          run: echo "$(ls ${{ matrix.lambda_function }}.zip)"
+        - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
+          run: echo "deploying ${{ matrix.lambda_function }}.zip to s3"

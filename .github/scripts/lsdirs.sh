@@ -7,3 +7,4 @@ for dir in $directories; do
 done
 dirs="${dirs::-1}]"
 echo "$dirs"
+
