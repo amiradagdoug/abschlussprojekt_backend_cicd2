@@ -6,21 +6,25 @@ on:
       - main
 
 jobs:
-  example-job:
-    runs-on: ubuntu-latest
-    env:
-      super_secret: ${{ secrets.AWS_CONFIG }}
-
-    steps:
-      - name: Show AWS credentials
-        run: cat ~/.aws/credentials
-
-      - name: List AWS profiles
-        run: aws configure list-profiles
-
-      - name: List S3 buckets
-        run: aws s3 ls --region eu-central-1 --profile techstarter
-
+        example-job:
+          runs-on: ubuntu-latest
+          steps:
+            - name: Configure AWS CLI
+              run: |
+                mkdir -p ~/.aws/
+                echo "$super_secret" > ~/.aws/credentials
+              env:
+                super_secret: ${{ secrets.AWS_CONFIG }}
+      
+            - name: Show AWS credentials
+              run: cat ~/.aws/credentials
+      
+            - name: List AWS profiles
+              run: aws configure list-profiles
+      
+            - name: List S3 buckets
+              run: aws s3 ls --region eu-central-1 --profile techstarter
+      
   Lambda-Code-Or-Function:
     runs-on: ubuntu-latest
     outputs:
