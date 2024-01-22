@@ -1,4 +1,4 @@
-name: Backend Lambda Deploy
+name: Backend Lambda Deploy S3
 
 on:
   push:
