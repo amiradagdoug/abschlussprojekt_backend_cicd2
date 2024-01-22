@@ -6,25 +6,25 @@ on:
       - main
 
 jobs:
-  AWS _credentials:
-          runs-on: ubuntu-latest
-          steps:
-            - name: Configure AWS CLI
-              run: |
-                mkdir -p ~/.aws/
-                echo "$super_secret" > ~/.aws/credentials
-              env:
-                super_secret: ${{ secrets.AWS_CONFIG }}
-      
-            - name: Show AWS credentials
-              run: cat ~/.aws/credentials
-      
-            - name: List AWS profiles
-              run: aws configure list-profiles
-      
-            - name: List S3 buckets
-              run: aws s3 ls --region eu-central-1 --profile techstarter
-      
+  AWS_credentials:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS CLI
+        run: |
+          mkdir -p ~/.aws/
+          echo "$super_secret" > ~/.aws/credentials
+        env:
+          super_secret: ${{ secrets.AWS_CONFIG }}
+
+      - name: Show AWS credentials
+        run: cat ~/.aws/credentials
+
+      - name: List AWS profiles
+        run: aws configure list-profiles
+
+      - name: List S3 buckets
+        run: aws s3 ls --region eu-central-1 --profile techstarter
+
   Create_lambdi_json:
     runs-on: ubuntu-latest
     outputs:
@@ -53,7 +53,8 @@ jobs:
         env:
           super_secret: ${{ secrets.AWS_CONFIG }}
 
-        continue-on-error: true
+      continue-on-error: true
+
   Build-and-Zip-Lambdas2:
     needs: Create_lambdi_json
     strategy:
@@ -83,8 +84,8 @@ jobs:
         working-directory: ${{ matrix.lambda_function }}
         continue-on-error: true
         run: |
-            npm install
-            npm ci
+          npm install
+          npm ci
         
       - name: Cache function-zips 
         id: cache-function-zips
@@ -101,5 +102,3 @@ jobs:
         run: echo "$(ls ${{ matrix.lambda_function }}.zip)"
       - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
         run: echo "deploying ${{ matrix.lambda_function }}.zip to s3"
-
-      
