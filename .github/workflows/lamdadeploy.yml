@@ -45,7 +45,7 @@ jobs:
         run: echo "${{ steps.list-functions.outputs.LAMBDA_TF }}"
         # trigger Matrix-Job Build-and-Zip-Lambdas
       - name: Deploy Lambdi.json to S3
-        run: aws s3 cp lambdi.json s3://tfstate-bucket-abschlussproject/lambdi.json
+        run: aws s3 cp lambdi.json s3://tfstate-bucket-abschlussproject1/lambdi.json
           
   Build-and-Zip-Lambdas2:
     needs: Lambda-Code-Or-Function
