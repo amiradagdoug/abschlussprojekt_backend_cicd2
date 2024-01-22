@@ -102,8 +102,4 @@ jobs:
       - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
         run: echo "deploying ${{ matrix.lambda_function }}.zip to s3"
 
-      - name: Clear Cache
-        run: |
-          git rm -r --cached .
-          git add .
-          git commit -m "Clear cache"
+      
