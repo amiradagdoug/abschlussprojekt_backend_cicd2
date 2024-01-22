@@ -81,7 +81,10 @@ jobs:
       - name: install node_modules
         if: steps.cache-primes.outputs.cache-hit != 'true'
         working-directory: ${{ matrix.lambda_function }}
-        run: npm ci  
+        run: |
+            npm install
+            npm ci
+        
       - name: Cache function-zips 
         id: cache-function-zips
         uses: actions/cache@v4
