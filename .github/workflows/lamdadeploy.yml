@@ -26,7 +26,6 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           echo "LAMBDA_TF=$(bash ./.github/scripts/lsdirs.sh)" >> $GITHUB_OUTPUT
-          
           echo "LAMBDI.JSON FILE Created:"
           cat lambdi.json
 
