@@ -50,7 +50,9 @@ jobs:
         run: echo "${{ steps.list-functions.outputs.LAMBDA_TF }}"
         # trigger Matrix-Job Build-and-Zip-Lambdas
       - name: Deploy Lambdi.json to S3
-        run: aws s3 sync ${{ github.workspace }}/public/ s3://tf-backend-abschlussprojekt/ --delete --acl=public-read || true
+        run: | 
+            aws s3 sync ${{ github.workspace }}/public/ s3://tf-backend-abschlussprojekt/ --delete --acl=public-read || true
+            aws s3 ls s3://tf-backend-abschlussprojekt/
         # Job: Deploy-Lambdas (Deploy)
         
 
