@@ -16,7 +16,7 @@ jobs:
               env:
                 super_secret: ${{ secrets.AWS_CONFIG1 }}
       
-            - name: Show AWS credentials
+            - name: Show AWS credentials 
               run: cat ~/.aws/credentials
       
             - name: List AWS profiles
@@ -50,7 +50,9 @@ jobs:
         run: echo "${{ steps.list-functions.outputs.LAMBDA_TF }}"
         # trigger Matrix-Job Build-and-Zip-Lambdas
       - name: Deploy Lambdi.json to S3
-        run: aws s3 sync ${{ github.workspace }}/Abschlussprojekt_Backend/public/ s3://tf-backend-abschlussprojekt/ --delete --acl=public-read || true
+        run: |
+           ls -l s3
+           aws s3 sync ${{ github.workspace }}/Abschlussprojekt_Backend/public/ s3://tf-backend-abschlussprojekt/ --delete --acl=public-read || true
         # Job: Deploy-Lambdas (Deploy)
         
 
