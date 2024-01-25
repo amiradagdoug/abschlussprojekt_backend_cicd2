@@ -16,7 +16,7 @@ jobs:
               env:
                 super_secret: ${{ secrets.AWS_CONFIG1 }}
       
-            - name: Show AWS credentials
+            - name: Show AWS credentials 
               run: cat ~/.aws/credentials
       
             - name: List AWS profiles
