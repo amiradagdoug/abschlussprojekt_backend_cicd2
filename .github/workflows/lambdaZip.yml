@@ -55,6 +55,9 @@ jobs:
           S3_KEY=login.zip
           LAMBDA_FUNCTION_NAME=login-google
           # Download the existing zip from S3
+          echo "Before aws s3 cp"
           aws s3 cp s3://$S3_BUCKET/$S3_KEY login.zip
+          echo "After aws s3 cp"
+
       
      
