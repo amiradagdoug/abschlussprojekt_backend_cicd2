@@ -96,6 +96,7 @@ jobs:
           path: ${{ github.workspace }}
           key: ${{ matrix.lambda_function }}-zip-${{ hashFiles('${{ matrix.lambda_function }}/index.js', '${{ matrix.lambda_function }}/package-lock.json') }}
       - name: zip functions
+        id: zip-functions
         if: steps.cache-function-zips.outputs.cache-hit != 'true'
         run: | 
           zip -q -r ${{ matrix.lambda_function }}.zip ${{ matrix.lambda_function }} node_modules package.json index.js package-lock.json
@@ -103,6 +104,8 @@ jobs:
       - name: Display result
         run: echo "$(ls ${{ matrix.lambda_function }}.zip)"
       - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
-        run: echo "deploying ${{ matrix.lambda_function }}.zip to s3"
+        run: |
+           aws s3 cp ${{ steps.zip-functions.outputs}}  s3://tf-backend-abschlussprojekt
+           echo "deploying ${{ matrix.lambda_function }}.zip to s3"
 
       
