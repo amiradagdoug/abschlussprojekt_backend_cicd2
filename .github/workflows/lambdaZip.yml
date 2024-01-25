@@ -33,12 +33,20 @@ jobs:
           fetch-depth: 2 # To fetch the current commit and its parent (so we can compare)
   
       - name: Setup AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1 # Modify this to your desired AWS region
-  
+        run: |
+          mkdir -p ~/.aws/
+          echo "$super_secret" > ~/.aws/credentials
+        env:
+         super_secret: ${{ secrets.AWS_CONFIG1 }}
+
+      - name: Show AWS credentials 
+        run: cat ~/.aws/credentials
+
+      - name: List AWS profiles
+        run: aws configure list-profiles
+
+      - name: List S3 buckets
+        run: aws s3 ls --region eu-central-1 --profile techstarter
     
       - name: Deploy Modified Files
         run: |
