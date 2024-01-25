@@ -54,7 +54,8 @@ jobs:
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set region eu-central-1
-          aws s3 sync ${{ github.workspace }}/Abschlussprojekt_Backend/public/ s3://tf-backend-abschlussproject/ --delete --acl=public-read
+          aws s3 cp lambdi.json s3://tf-backend-abschlussproject/ --acl=public-read
+
         env:
           AWS_DEFAULT_REGION: eu-central-1
       
