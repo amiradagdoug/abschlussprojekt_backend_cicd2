@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 # ohne Params, gibt es eine Liste von allen Verzeichnissen aus dem aktuellen Verzeichnis aus.
 # Erstellt ein JSON-Objekt mit allen Lambda-Definitionen
 directories=$(find ./* -type d -prune)
