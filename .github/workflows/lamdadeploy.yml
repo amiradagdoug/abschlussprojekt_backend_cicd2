@@ -111,7 +111,7 @@ jobs:
         run: echo "$(ls ${{ matrix.lambda_function }}.zip)"
       - name: deploy lambda-function.zips to s3 and trigger Terraform-Deploy
         run: |
-           aws s3 cp ${{ steps.zip-functions.outputs}}  s3://tf-backend-abschlussprojekt
+           aws s3 cp ${{ steps.zip-functions.outputs}}  s3://testamiras3lambda
            echo "deploying ${{ matrix.lambda_function }}.zip to s3"
 
       
