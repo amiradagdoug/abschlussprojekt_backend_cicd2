@@ -1,63 +1,63 @@
-name: Backend Lambda Zip Deploy S3
+name: Deploy Lambda Functions to S3
+
 on:
-    push:
-      branches:
-        - main
-  
+  push:
+    branches:
+      - main
+
 jobs:
-    example-job:
-            runs-on: ubuntu-latest
-            steps:
-              - name: Configure AWS CLI
-                run: |
-                  mkdir -p ~/.aws/
-                  echo "$super_secret" > ~/.aws/credentials
-                env:
-                  super_secret: ${{ secrets.AWS_CONFIG1 }}
-        
-              - name: Show AWS credentials 
-                run: cat ~/.aws/credentials
-        
-              - name: List AWS profiles
-                run: aws configure list-profiles
-        
-              - name: List S3 buckets
-                run: aws s3 ls --region eu-central-1 --profile techstarter
-    deploy:
-      runs-on: ubuntu-latest
-  
-      steps:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lambda-function: [lambda_test, login-google]
+
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          fetch-depth: 2 # To fetch the current commit and its parent (so we can compare)
-  
-      - name: Setup AWS CLI
+          node-version: 14
+
+      - name: Install Dependencies
+        run: npm install -g aws-cli
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Add execute permissions to lsdirs.sh
+        run: chmod +x ./.github/scripts/lsdirs.sh
+
+      - name: Run lsdirs.sh and zip Lambda function
+        run: ./.github/scripts/lsdirs.sh
+
+      - name: Zip Lambda function
+        run: |
+          cd lambda-functions/${{ matrix.lambda-function }}
+          zip -r "${{ matrix.lambda-function }}.zip" index.js lambda_def.json package.json package-lock.json
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS CLI
         run: |
           mkdir -p ~/.aws/
-          echo "$super_secret" > ~/.aws/credentials
+          echo "AWS_ACCESS_KEY_ID = $AWS_ACCESS_KEY_ID" >> ~/.aws/config
+          echo "AWS_SECRET_ACCESS_KEY = $AWS_SECRET_ACCESS_KEY" >> ~/.aws/config
+          echo "AWS_REGION = eu-central-1" >> ~/.aws/config
         env:
-         super_secret: ${{ secrets.AWS_CONFIG1 }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Show AWS credentials 
-        run: cat ~/.aws/credentials
-
-      - name: List AWS profiles
-        run: aws configure list-profiles
-
-      - name: List S3 buckets
-        run: aws s3 ls --region eu-central-1 --profile techstarter
-    
-      - name: Deploy Modified Files
+      - name: Upload Lambda ZIPs to S3
         run: |
-       
-          S3_BUCKET=s3://tf-backend-abschlussproject/ 
-          S3_KEY=login.zip
-          LAMBDA_FUNCTION_NAME=login-google
-          # Download the existing zip from S3
-          echo "Before aws s3 cp"
-          aws s3 cp s3://$S3_BUCKET/$S3_KEY login.zip
-          echo "After aws s3 cp"
-
+          S3_BUCKET=tfstate-bucket-abschlussproject
+          for file in $(find . -type f -name '*.zip'); do
+            aws s3 cp "$file" "s3://$S3_BUCKET/$(basename "$file")" --region eu-central-1
+          done
       
      
