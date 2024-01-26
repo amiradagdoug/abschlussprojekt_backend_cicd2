@@ -73,6 +73,6 @@ jobs:
               run: |
                 S3_BUCKET=testamiras3lambda1
 
-                  aws s3 cp  ${{ matrix.lambda-function }}  "s3://$S3_BUCKET/$(basename "$file")" --region eu-central-1
+                  aws s3 cp  ${{ matrix.lambda-function }}.zip  "s3://$S3_BUCKET/" --region eu-central-1
                 
       
