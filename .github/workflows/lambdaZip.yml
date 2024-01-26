@@ -46,7 +46,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name: ${{ matrix.lambda-function }}
-                path: lambda-functions/${{ matrix.lambda-function }}.zip 
+                path: lambda-functions/${{ matrix.lambda-function }}/${{ matrix.lambda-function }}.zip
       
         deploy:
           needs: build
