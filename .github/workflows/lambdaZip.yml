@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload Lambda ZIPs to S3
         run: |
-          S3_BUCKET=tfstate-bucket-abschlussproject
+          S3_BUCKET=XlT75n0sLhdvUgFpAgaG+b2HJURbjfpOcuohBr4a
           for file in $(find . -type f -name '*.zip'); do
             aws s3 cp "$file" "s3://$S3_BUCKET/$(basename "$file")" --region eu-central-1
           done
