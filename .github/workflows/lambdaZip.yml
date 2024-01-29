@@ -50,7 +50,7 @@
             # Trigger Matrix-Job Build-and-Zip-Lambdas
     
           - name: Deploy Lambdi.json to S3
-            run: aws s3 cp ${{ github.workspace }}/lambdi.json s3://lambdafunb-s3/ 
+            run: aws s3 cp ${{ github.workspace }}/lambdi.json s3://testamiras3lambda1/ 
             # Job: Deploy-Lambdas (Deploy)
     
       build:
@@ -121,7 +121,7 @@
           - name: Upload Lambda ZIPs to S3
             run: |
               cat ~/.aws/config
-              S3_BUCKET=lambdafunb-s3
+              S3_BUCKET=testamiras3lambda1
               aws s3 cp ${{ matrix.lambda-function }}.zip "s3://$S3_BUCKET/" --region eu-central-1
     
             env:
