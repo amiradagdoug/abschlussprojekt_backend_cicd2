@@ -52,7 +52,8 @@
           - name: Deploy Lambdi.json to S3
             run: aws s3 cp ${{ github.workspace }}/lambdi.json s3://testamiras3lambda1/ 
             # Job: Deploy-Lambdas (Deploy)
-    
+
+         
       build:
         needs: Lambda-Code-Or-Function
         runs-on: ubuntu-latest
@@ -71,13 +72,13 @@
     
           - name: Zip Lambda function
             run: |
-              cd ${{ github.workspace }}/lambda-functions/${{ matrix.lambda-function }}
+              cd ${{ github.workspace }}/${{ matrix.lambda-function }}
               npm i
               ls
               echo $(pwd)
               zip -r -q ${{ matrix.lambda-function }}.zip node_modules index.js package.json package-lock.json
               ls
-    
+      
           - name: Print ZIP contents
             run: unzip -l ${{ github.workspace }}/lambda-functions/${{ matrix.lambda-function }}/${{ matrix.lambda-function }}.zip
     
