@@ -72,7 +72,7 @@
     
           - name: Zip Lambda function
             run: |
-              cd ${{ github.workspace }}/${{ matrix.lambda-function }}
+              cd ${{ matrix.lambda-function }}
               npm i
               ls
               echo $(pwd)
